@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>car</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+</head>
+
+<body>
+<header>
+    <h1>Car</h1>
+</header>
+
+<nav>
+    <ul>
+      <li><a href="./index.html">Admin Panel</a></li>
+    </ul>
+</nav>
+
+<script>
+    $(document).ready(function() {
+        const queryString = window.location.search;
+        const urlParams = new URLSearchParams(queryString);
+        const manufacturerId = urlParams.get('manufacturer-id');
+        const carId = urlParams.get('car-id');
+        document.getElementById("manufacturerId").value = manufacturerId;
+        console.log("manufacturerId:" + manufacturerId);
+        console.log("carId:" + carId);
+
+        if(carId) {
+        console.log('carId exists');
+            $.ajax({
+                type: 'GET',
+                data: {},
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                url: "http://localhost:8080/models/"+carId,
+                success:function(data){
+                    console.log("got the carId");
+                    document.getElementById("manufacturerId").value = data.manufacturerId;
+                    document.getElementById("name").value = data.name;
+                }
+            });
+        }
+    });
+</script>
+
+<section>
+    <form id="createUpdateCar">
+        <table>
+            <tbody>
+                <tr>
+                    <td>manufacturerId</td>
+                    <td>
+                        <input id="manufacturerId" type="text" name="manufacturerId" required>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Name</td>
+                    <td>
+                        <input id="name" type="text" name="name" required>
+                    </td>
+                </tr>                
+            </tbody>
+        </table>
+        <br>
+        <button style="cursor:pointer">Save</button>
+        <input type="submit" style="display:none">
+    </form>
+</section>
+
+<script type="text/javascript" charset="utf-8">
+    $("#createUpdateCar").submit(function(e) {
+        e.preventDefault(); // avoid to execute the actual submit of the form.
+
+        var form = $(this);
+        var data = form.serializeArray();
+
+        const queryString = window.location.search;
+        const urlParams = new URLSearchParams(queryString);
+        const carId = urlParams.get('car-id');
+        console.log("carId:" + carId);
+
+        if(!carId) {
+            $.ajax({
+                type: "POST",
+                url: "http://localhost:8080/models",
+                dataType : 'json',
+                contentType: 'application/json',
+                data: JSON.stringify(getFormData(data)),
+                success: function(data) {
+                    window.location.replace("./cars.html");
+                }
+            });
+        } else {
+            $.ajax({
+                type: "PUT",
+                url: "http://localhost:8080/models/"+carId,
+                dataType : 'json',
+                contentType: 'application/json',
+                data: JSON.stringify(getFormData(data)),
+                success: function(data) {
+                    window.location.replace("./cars.html");
+                }
+            });
+        }
+    });
+
+    //utility function
+    function getFormData(data) {
+       var unindexed_array = data;
+       var indexed_array = {};
+
+       $.map(unindexed_array, function(n, i) {
+        indexed_array[n['name']] = n['value'];
+       });
+
+       return indexed_array;
+    }
+</script>
+</body>
+</html>

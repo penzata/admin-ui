@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Manufacturers table</title>
+    <style>
+table, th, td {
+  border: 1px solid black;
+}
+</style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script type="text/javascript" charset="utf-8">
+        $(document).ready(function(){
+            $.ajax({
+                type: 'GET',
+                data: {},
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                url: "http://localhost:8080/manufacturers",
+                success:function(data) {
+                    data.forEach(element => {
+                       $('#manufacturers').append("<tr>\
+                                                    <td>"+element.id+"</td>\
+                                                    <td>"+element.name+"</td>\
+                                                    <td>\
+                                                        <a href='./manufacturer.html?manufacturer-id="+element.id+"'>edit</a>\
+                                                    </td>\
+                                                    <td><button onclick='deleteManufacturer("+element.id+")'>delete</button></td>\
+                                                    <td>\
+                                                        <a href='./car.html?manufacturer-id="+element.id+"'>create car model</a>\                                                      </a>\
+                                                    </td>\
+                                                    <td>\
+                                                        <a href='./carsByManufacturer.html?manufacturer-id="+element.id+"'>list cars</a>\                                                      </a>\
+                                                    </td>\
+                                                    </tr>");
+                    });
+                },
+                error:function(errorMessage) {
+                    console.log(errorMessage);
+                }
+            });
+        });
+
+        //utility function
+        function deleteManufacturer(id) {
+        $.ajax({
+                    type: 'DELETE',
+                    contentType: "application/json; charset=utf-8",
+                    url: "http://localhost:8080/manufacturers/"+id,
+                    success:function() {
+                        window.location.reload();
+                        alert("manufacturer deleted");
+                    },
+                    error:function(errorMessage) {
+                        console.log(errorMessage);
+                    }
+                });
+        }
+    </script>
+</head>
+
+<body>
+<header style="text-align: center;">
+    <h1>Manufacturers</h1>
+</header>
+
+<nav>
+    <ul>
+      <li><a href="./manufacturer.html">create manufacturer</a></li>
+      <br>
+      <li><a href="./index.html">Admin Panel</a></li>
+    </ul>
+</nav>
+
+<br><br>
+<section>
+    <table style="width:65%">
+        <thead>
+        <tr>
+            <th scope="col">id</th>
+            <th scope="col">manufacturer</th>
+        </tr>
+        </thead>
+        <tbody id="manufacturers">
+        </tbody>
+    </table>
+</section>
+</body>
+</html>

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>manufacturer</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+</head>
+
+<body>
+<header>
+    <h1>Manufacturer</h1>
+</header>
+
+<nav>
+    <ul>
+      <li><a href="./index.html">Admin Panel</a></li>
+    </ul>
+</nav>
+
+<script>
+    $(document).ready(function() {
+        const queryString = window.location.search;
+        const urlParams = new URLSearchParams(queryString);
+        const manufacturerId = urlParams.get('manufacturer-id');
+        console.log("manufacturerId:" + manufacturerId);
+
+        if(manufacturerId) {
+        console.log('exists');
+            $.ajax({
+                type: 'GET',
+                data: {},
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                url: "http://localhost:8080/manufacturers/"+manufacturerId,
+                success:function(data){
+                    console.log("got the data");
+                    document.getElementById("name").value = data.name;
+                    document.getElementById("country").value = data.country;
+                    document.getElementById("address").value = data.address;
+                }
+            });
+        }
+    });
+</script>
+
+<section>
+    <form id="createUpdateManufacturer">
+        <table>
+            <tbody>
+                <tr>
+                    <td>Name</td>
+                    <td>
+                        <input id="name" type="text" name="name" required>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Country</td>
+                    <td>
+                        <input id="country" type="text" name="country" required>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Address</td>
+                    <td>
+                        <input id="address" type="text" name="address" required>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <br>
+        <button style="cursor:pointer">Save</button>
+        <input type="submit" style="display:none">
+    </form>
+</section>
+
+<script type="text/javascript" charset="utf-8">
+    $("#createUpdateManufacturer").submit(function(e) {
+        e.preventDefault(); // avoid to execute the actual submit of the form.
+
+        var form = $(this);
+        var data = form.serializeArray();
+
+        const queryString = window.location.search;
+        const urlParams = new URLSearchParams(queryString);
+        const manufacturerId = urlParams.get('manufacturer-id');
+        console.log("manufacturerId:" + manufacturerId);
+
+        if(!manufacturerId) {
+            $.ajax({
+                type: "POST",
+                url: "http://localhost:8080/manufacturers",
+                dataType : 'json',
+                contentType: 'application/json',
+                data: JSON.stringify(getFormData(data)),
+                success: function(data) {
+                    window.location.replace("./manufacturers.html");
+                }
+            });
+        } else {
+            $.ajax({
+                type: "PUT",
+                url: "http://localhost:8080/manufacturers/"+manufacturerId,
+                dataType : 'json',
+                contentType: 'application/json',
+                data: JSON.stringify(getFormData(data)),
+                success: function(data) {
+                    window.location.replace("./manufacturers.html");
+                }
+            });
+        }
+    });
+
+    //utility function
+    function getFormData(data) {
+       var unindexed_array = data;
+       var indexed_array = {};
+
+       $.map(unindexed_array, function(n, i) {
+        indexed_array[n['name']] = n['value'];
+       });
+
+       return indexed_array;
+    }
+</script>
+</body>
+</html>
